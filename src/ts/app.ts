@@ -47,6 +47,7 @@ app.use(
 		preflightContinue: false,
 	})
 );
+app.options('*',cors());
 
 app.all('*', async (req: { [key: string]: any }, res: { [key: string]: any }, next: any) => {
 	const apiResponse = new ApiResponse();

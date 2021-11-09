@@ -1,23 +1,4 @@
-######################################################
-#Configurações Cloud Storage
-######################################################
-resource "google_storage_bucket" "adinfo_bucket" {
-  name          = local.final_bucket_name
-  location      = var.location
 
-  labels = {
-    produto = local.project_name
-  }
-}
-
-resource "google_storage_bucket" "adinfo_code" {
-  name          = local.code_bucket
-  location      = var.location
-
-  labels = {
-    produto = local.project_name
-  }
-}
 
 # ######################################################
 # #Shell Script
@@ -34,7 +15,7 @@ resource "null_resource" "code_zip" {
     command = "bash scripts/using-local-adinfo-project.sh ${var.project_version} ${local.code_bucket}"
   }
 
-  depends_on = [google_storage_bucket.adinfo_code, null_resource.create_dotenv]
+  #depends_on = [google_storage_bucket.adinfo_code, null_resource.create_dotenv]
   # depends_on = [null_resource.create_dotenv]
 }
 
@@ -80,21 +61,4 @@ resource "google_app_engine_standard_app_version" "adinfo" {
 }
 
 
-######################################################
-#Configurações Firestore
-######################################################
-resource "google_firestore_document" "mydoc" {
-  project     = var.project_id
-  collection  = "companies"
-  document_id = var.company
-  fields      = "{}"
-}
-
-resource "google_firestore_document" "sub_document" {
-  project     = var.project_id
-  collection  = "${google_firestore_document.mydoc.path}/config"
-  document_id = "config_1"
-  fields      = var.pre_config == "2" ? file("config_schemas/adobe.json") : file("config_schemas/ga.json")
-  depends_on  = [google_firestore_document.mydoc]
-}
 
